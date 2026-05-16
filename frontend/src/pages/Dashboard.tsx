@@ -92,7 +92,7 @@ export default function Dashboard() {
 
   const logout = () => {
     localStorage.clear();
-    window.location.href = "/";
+    window.location.href = "/#/";
   };
 
   const navItems = [
