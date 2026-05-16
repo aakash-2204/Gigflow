@@ -3,10 +3,14 @@
 A full-stack MERN lead management dashboard built for the ServiceHive Full Stack Development Internship assignment.
 
 ## Live Links
+Frontend:
+https://gigflow-7cfc.vercel.app/#/
 
-Frontend: YOUR_VERCEL_LINK  
-Backend: https://gigflow-w412.onrender.com  
-GitHub: YOUR_GITHUB_REPO_LINK  
+Backend:
+https://gigflow-w412.onrender.com 
+
+GitHub: 
+https://github.com/aakash-2204/Gigflow
 
 ## Tech Stack
 
@@ -67,4 +71,15 @@ POST `/api/auth/register`
   "email": "admin@gmail.com",
   "password": "admin123",
   "role": "admin"
+}
+
+To login, send:
+
+POST https://gigflow-w412.onrender.com/api/auth/login
+
+with body:
+
+{
+ "email":"admin@gmail.com",
+ "password":"admin123"
 }
