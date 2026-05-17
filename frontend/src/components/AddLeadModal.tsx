@@ -1,74 +1,148 @@
 import { useState } from "react";
 import API from "../api/api";
 
+type Lead = {
+  _id: string;
+  name: string;
+  email: string;
+  status: "New" | "Contacted" | "Qualified" | "Lost";
+  source: "Website" | "Instagram" | "Referral";
+};
+
 type Props = {
   onClose: () => void;
   onSuccess: () => void;
+  editLead?: Lead | null;
 };
 
-export default function AddLeadModal({ onClose, onSuccess }: Props) {
+export default function AddLeadModal({
+  onClose,
+  onSuccess,
+  editLead,
+}: Props) {
+  const [loading, setLoading] = useState(false);
+
   const [form, setForm] = useState({
-    name: "",
-    email: "",
-    status: "New",
-    source: "Website",
+    name: editLead?.name || "",
+    email: editLead?.email || "",
+    status: editLead?.status || "New",
+    source: editLead?.source || "Website",
   });
 
   const [error, setError] = useState("");
 
   const saveLead = async () => {
-    if (!form.name || !form.email) {
-      setError("Please enter name and email.");
-      return;
-    }
+    try {
+      setLoading(true);
+      setError("");
 
-    await API.post("/leads", form);
-    onSuccess();
-    onClose();
+      if (!form.name || !form.email) {
+        setError("Please enter name and email");
+        return;
+      }
+
+      if (editLead) {
+        // UPDATE
+        await API.put(`/leads/${editLead._id}`, form);
+      } else {
+        // CREATE
+        await API.post("/leads", form);
+      }
+
+      onSuccess();
+      onClose();
+    } catch (err) {
+      console.log(err);
+      setError("Failed to save lead");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
-      <div className="w-[500px] card-soft overflow-hidden">
-        <div className="px-7 py-5 border-b border-gray-100 flex justify-between items-center">
+    <div className="fixed inset-0 bg-black/40 z-[9999] flex items-center justify-center">
+      <div className="w-[500px] bg-white rounded-3xl shadow-xl overflow-hidden">
+
+        {/* Header */}
+        <div className="px-7 py-5 border-b flex justify-between items-center">
           <div>
-            <h2 className="text-xl font-bold">Add New Lead</h2>
-            <p className="text-sm text-[#6B7280]">Create a new sales prospect</p>
+            <h2 className="text-2xl font-bold">
+              {editLead ? "Edit Lead" : "Add Lead"}
+            </h2>
+
+            <p className="text-gray-500 mt-1">
+              {editLead
+                ? "Update lead information"
+                : "Create a new sales lead"}
+            </p>
           </div>
 
-          <button onClick={onClose} className="text-2xl text-[#6B7280]">
+          <button
+            onClick={onClose}
+            className="text-2xl text-gray-400"
+          >
             ×
           </button>
         </div>
 
+
+        {/* Form */}
         <div className="p-7 space-y-5">
+
           <div>
-            <label className="text-sm font-semibold">Full Name</label>
+            <label className="font-semibold">
+              Name
+            </label>
+
             <input
-              className="w-full mt-2 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g. Michael Chen"
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              value={form.name}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  name: e.target.value,
+                })
+              }
+              className="w-full mt-2 border rounded-xl px-4 py-3"
+              placeholder="Enter name"
             />
           </div>
 
+
           <div>
-            <label className="text-sm font-semibold">Email Address</label>
+            <label className="font-semibold">
+              Email
+            </label>
+
             <input
-              className={`w-full mt-2 border rounded-xl px-4 py-3 outline-none ${
-                error ? "border-[#EF4444]" : "border-gray-200"
-              }`}
-              placeholder="michael@example.com"
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              value={form.email}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  email: e.target.value,
+                })
+              }
+              className="w-full mt-2 border rounded-xl px-4 py-3"
+              placeholder="Enter email"
             />
-            {error && <p className="text-sm text-[#EF4444] mt-2">{error}</p>}
           </div>
+
 
           <div className="grid grid-cols-2 gap-4">
+
             <div>
-              <label className="text-sm font-semibold">Lead Status</label>
+              <label className="font-semibold">
+                Status
+              </label>
+
               <select
-                className="w-full mt-2 border border-gray-200 rounded-xl px-4 py-3"
-                onChange={(e) => setForm({ ...form, status: e.target.value })}
+                value={form.status}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    status: e.target.value as Lead["status"],
+                  })
+                }
+                className="w-full mt-2 border rounded-xl px-4 py-3"
               >
                 <option>New</option>
                 <option>Contacted</option>
@@ -77,33 +151,65 @@ export default function AddLeadModal({ onClose, onSuccess }: Props) {
               </select>
             </div>
 
+
             <div>
-              <label className="text-sm font-semibold">Lead Source</label>
+              <label className="font-semibold">
+                Source
+              </label>
+
               <select
-                className="w-full mt-2 border border-gray-200 rounded-xl px-4 py-3"
-                onChange={(e) => setForm({ ...form, source: e.target.value })}
+                value={form.source}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    source: e.target.value as Lead["source"],
+                  })
+                }
+                className="w-full mt-2 border rounded-xl px-4 py-3"
               >
                 <option>Website</option>
                 <option>Instagram</option>
                 <option>Referral</option>
               </select>
             </div>
+
           </div>
 
-          <textarea
-            className="w-full border border-gray-200 rounded-xl px-4 py-3"
-            placeholder="Additional lead notes..."
-          />
+
+          {error && (
+            <p className="text-red-500">
+              {error}
+            </p>
+          )}
         </div>
 
-        <div className="px-7 py-5 bg-[#F5F6FA] flex justify-end gap-3">
-          <button onClick={onClose} className="btn-secondary">
+
+
+        {/* Footer */}
+        <div className="px-7 py-5 bg-gray-50 flex justify-end gap-4">
+
+          <button
+            onClick={onClose}
+            className="px-5 py-2 rounded-xl border"
+          >
             Cancel
           </button>
-          <button onClick={saveLead} className="btn-primary">
-            Save Lead
+
+
+          <button
+            onClick={saveLead}
+            disabled={loading}
+            className="bg-blue-600 text-white px-6 py-2 rounded-xl"
+          >
+            {loading
+              ? "Saving..."
+              : editLead
+              ? "Update Lead"
+              : "Save Lead"}
           </button>
+
         </div>
+
       </div>
     </div>
   );
