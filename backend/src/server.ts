@@ -27,7 +27,8 @@ app.use(
     origin: [
       "http://localhost:5173",
       "https://gigflow-7cfc.vercel.app",
-      "https://gigflow-jx774rghw-aakash-2204s-projects.vercel.app"
+      "https://gigflow-jx774rghw-aakash-2204s-projects.vercel.app",
+      "https://gigflow-6d4vzw81r-aakash-2204s-projects.vercel.app"
     ],
     credentials: true,
   })
