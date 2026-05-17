@@ -24,9 +24,10 @@ export default function Login() {
       );
 
       window.location.href = "/#/dashboard";
-    } catch {
-      alert("Login failed");
-    } finally {
+} catch (error: any) {
+  console.log("LOGIN ERROR:", error.response?.data || error.message);
+  alert(error.response?.data?.message || "Login failed");
+}finally {
       setLoading(false);
     }
   };
