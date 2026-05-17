@@ -1,0 +1,17 @@
+GigFlow Assignment Submission
+
+GitHub Repository:
+https://github.com/aakash-2204/Gigflow
+
+Frontend Deployment:
+https://gigflow-7cfc.vercel.app
+
+Backend Deployment:
+https://gigflow-w412.onrender.com
+
+Loom Demo Video:
+PASTE_YOUR_LOOM_LINK_HERE
+
+Test Login:
+Email: admin@gmail.com
+Password: admin123
