@@ -47,17 +47,19 @@ export const createLead = async (req: AuthRequest, res: Response) => {
     });
 
     return res.status(201).json({
+      success: true,
       message: "Lead created successfully",
       lead,
     });
   } catch (error: any) {
     return res.status(500).json({
+      success: false,
       message: error.message,
     });
   }
 };
 
-// GET LEADS WITH FILTER, SEARCH, SORT, PAGINATION
+// GET ALL LEADS WITH FILTER, SEARCH, SORT, PAGINATION
 export const getLeads = async (req: AuthRequest, res: Response) => {
   try {
     const { status, source, search, sort = "latest", page = 1 } = req.query;
@@ -66,9 +68,7 @@ export const getLeads = async (req: AuthRequest, res: Response) => {
     const limit = 10;
     const skip = (currentPage - 1) * limit;
 
-    const query: any = {
-      createdBy: req.user?.id,
-    };
+    const query: any = {};
 
     if (status && validStatuses.includes(String(status))) {
       query.status = status;
@@ -105,7 +105,7 @@ export const getLeads = async (req: AuthRequest, res: Response) => {
       .skip(skip)
       .limit(limit);
 
-    const totalPages = Math.ceil(total / limit);
+    const totalPages = Math.ceil(total / limit) || 1;
 
     return res.status(200).json({
       success: true,
@@ -119,6 +119,7 @@ export const getLeads = async (req: AuthRequest, res: Response) => {
     });
   } catch (error: any) {
     return res.status(500).json({
+      success: false,
       message: error.message,
     });
   }
@@ -127,20 +128,22 @@ export const getLeads = async (req: AuthRequest, res: Response) => {
 // GET SINGLE LEAD DETAILS
 export const getLeadById = async (req: AuthRequest, res: Response) => {
   try {
-    const lead = await Lead.findOne({
-      _id: req.params.id,
-      createdBy: req.user?.id,
-    });
+    const lead = await Lead.findById(req.params.id);
 
     if (!lead) {
       return res.status(404).json({
+        success: false,
         message: "Lead not found",
       });
     }
 
-    return res.status(200).json(lead);
+    return res.status(200).json({
+      success: true,
+      lead,
+    });
   } catch (error: any) {
     return res.status(500).json({
+      success: false,
       message: error.message,
     });
   }
@@ -153,27 +156,27 @@ export const updateLead = async (req: AuthRequest, res: Response) => {
 
     if (email && !isValidEmail(email)) {
       return res.status(400).json({
+        success: false,
         message: "Please enter a valid email address",
       });
     }
 
     if (status && !validStatuses.includes(status)) {
       return res.status(400).json({
+        success: false,
         message: "Invalid lead status",
       });
     }
 
     if (source && !validSources.includes(source)) {
       return res.status(400).json({
+        success: false,
         message: "Invalid lead source",
       });
     }
 
-    const lead = await Lead.findOneAndUpdate(
-      {
-        _id: req.params.id,
-        createdBy: req.user?.id,
-      },
+    const lead = await Lead.findByIdAndUpdate(
+      req.params.id,
       {
         name,
         email,
@@ -188,16 +191,19 @@ export const updateLead = async (req: AuthRequest, res: Response) => {
 
     if (!lead) {
       return res.status(404).json({
+        success: false,
         message: "Lead not found",
       });
     }
 
     return res.status(200).json({
+      success: true,
       message: "Lead updated successfully",
       lead,
     });
   } catch (error: any) {
     return res.status(500).json({
+      success: false,
       message: error.message,
     });
   }
@@ -206,22 +212,22 @@ export const updateLead = async (req: AuthRequest, res: Response) => {
 // DELETE LEAD
 export const deleteLead = async (req: AuthRequest, res: Response) => {
   try {
-    const lead = await Lead.findOneAndDelete({
-      _id: req.params.id,
-      createdBy: req.user?.id,
-    });
+    const lead = await Lead.findByIdAndDelete(req.params.id);
 
     if (!lead) {
       return res.status(404).json({
+        success: false,
         message: "Lead not found",
       });
     }
 
     return res.status(200).json({
+      success: true,
       message: "Lead deleted successfully",
     });
   } catch (error: any) {
     return res.status(500).json({
+      success: false,
       message: error.message,
     });
   }
