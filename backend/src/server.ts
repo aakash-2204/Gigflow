@@ -22,6 +22,16 @@ app.use(
   })
 );
 
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://gigflow-7cfc.vercel.app",
+      "https://gigflow-jx774rghw-aakash-2204s-projects.vercel.app"
+    ],
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
